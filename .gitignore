@@ -1,0 +1,4 @@
+.env
+.tunnel_url
+n8n_data/
+.n8n/
