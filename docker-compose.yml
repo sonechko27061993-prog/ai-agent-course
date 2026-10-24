@@ -1,0 +1,30 @@
+services:
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: ai_course_tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://n8n:5678
+    environment:
+      - TZ=${TZ:-Europe/Warsaw}
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: ai_course_n8n
+    restart: unless-stopped
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Europe/Warsaw}
+      - TZ=${TZ:-Europe/Warsaw}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    depends_on:
+      - tunnel
